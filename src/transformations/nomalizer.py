@@ -11,6 +11,7 @@ def nomalize_datafram(df:DataFrame, datetime_column:str="datetime") -> DataFrame
 
     Columns Created:
         - date: The full date extracted from the timestamp (YYYY-MM-DD).
+        - year: The year as an integer.
         - month: The month as an integer (1 to 12), used for seasonal filtering.
         - month_id: The first day of the month extracted from the timestamp (YYYY-MM-DD).
 
@@ -19,8 +20,9 @@ def nomalize_datafram(df:DataFrame, datetime_column:str="datetime") -> DataFrame
     :return: DataFrame
     """
     df = df \
-        .withColumn("date", F.col(datetime_column).cast("date")) \
-        .withColumn("month", F.month("date")) \
-        .withColumn("month_id", F.date_trunc("month", F.col("date")).cast("date"))
+        .withColumn("date", F.col(datetime_column).cast("date"))
+        # .withColumn("year", F.year("date")) \
+        # .withColumn("month", F.month("date")) \
+        # .withColumn("month_id", F.date_trunc("month", F.col("date")).cast("date"))
 
     return df

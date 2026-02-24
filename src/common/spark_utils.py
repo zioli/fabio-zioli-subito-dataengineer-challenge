@@ -38,6 +38,9 @@ def get_dataframe(logger:Logger, spark:SparkSession, file_path:str) -> DataFrame
     df = spark.read \
         .option("header", "true") \
         .option("skipRows", 1) \
+        .option("nullValue", "NULL") \
+        .option("nullValue", "null") \
+        .option("inferSchema", "true") \
         .csv(file_path) \
         .toDF(*columns)
 

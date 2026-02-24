@@ -1,6 +1,7 @@
 from pyspark.sql import functions as F
 from pyspark.sql import DataFrame
-from src.metadata import WeatherDescription
+from src.metadata import WeatherDescription, Granularity
+
 
 # "sky is clear"
 
@@ -11,19 +12,47 @@ def filter_by_weather_description(df:DataFrame, description:str, weather_descrip
     return filtered_df
 
 
-def filter_season(df:DataFrame, season_months: list[int], month_column_name:str="month") -> DataFrame:
+def filter_season(df:DataFrame, season_months: list[int]) -> DataFrame:
     """
     Narrows down the dataset to focus exclusively on a specific season.
 
-    :param df: **required** The dataset must include a month column, represented as an integer (e.g., 1 for January, 12 for December).
+    :param df: **required** The dataset must include the `date`.
     :param season_months: **required**  an array of integers. see src.metadata.Season:
-    :param month_column_name: It takes the "month" name as a default name
     :return: DataFrame
     """
     filtered_df = df.filter(
-        (F.col(month_column_name).isin(season_months))
+        F.month("date").isin(season_months)
     )
     return filtered_df
+
+
+def calculate_stats(df: DataFrame, metric:str, granularity:str ) -> DataFrame:
+    """
+    It calculates the aggregated statistics for a specific metric and granularity (`src.metadata.constants.Granularity`).
+
+    - standard deviation
+    - min
+    - max
+
+    :param df: **required** Expected the following columns `date`, `country` and the **metric** passed as parameter.
+    :param metric:
+    :param granularity: see *src.metadata.constants.Granularity*
+    :return: DataFrame
+    """
+    agg_df = df.withColumn(granularity, F.date_trunc(granularity, F.col("date")).cast("date"))
+
+    agg_df = agg_df.groupby(granularity, "country").agg(
+        F.stddev(metric).alias(f"stddev_{metric}"),
+        F.min(metric).alias(f"min_{metric}"),
+        F.max(metric).alias(f"max_{metric}"),
+    )
+
+    return agg_df
+
+
+
+
+    return df
 
 
 
@@ -44,8 +73,6 @@ def get_clear_weather_cities_by_season(df:DataFrame, season_months:list[int], th
     missing = [c for c in required_columns if c not in df_columns]
     if missing:
         raise Exception("Missing required columns: {}".format(missing))
-
-
 
     # Narrow down the dataframe to keep only rows from the season
     agg_df = filter_season(df, season_months)
