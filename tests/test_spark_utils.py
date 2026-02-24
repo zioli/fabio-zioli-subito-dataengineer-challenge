@@ -1,5 +1,4 @@
-from unittest.mock import patch, mock_open, MagicMock
-from src import spark_utils as sutils
+from src.common import spark_utils as sutils
 
 
 def test_build_stack_expression():

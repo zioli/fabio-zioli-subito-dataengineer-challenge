@@ -1,12 +1,13 @@
+from src.metadata import WeatherDescription
 
 
-columnas_fijas = ["Producto", "Categoria", "Tienda", "Ciudad"]
+
+values = WeatherDescription.get_clear_weather()
 
 
-def mi_funcion(*args):
-    print(args[2])
+for v in values:
+    print(v)
 
-mi_funcion(*columnas_fijas)
 
 
 

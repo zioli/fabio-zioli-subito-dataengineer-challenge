@@ -5,7 +5,6 @@ import argparse
 import json
 
 def get_columns_names(file_path:str)->list:
-    print("here we go")
     with open(file_path, 'r') as f:
         reader = csv.reader(f)
         columns = next(reader)
