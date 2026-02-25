@@ -1,5 +1,5 @@
 from pyspark.sql import functions as F, DataFrame
-
+import csv
 
 def nomalize_datafram(df:DataFrame, datetime_column:str="datetime") -> DataFrame:
     """
@@ -24,5 +24,12 @@ def nomalize_datafram(df:DataFrame, datetime_column:str="datetime") -> DataFrame
         # .withColumn("year", F.year("date")) \
         # .withColumn("month", F.month("date")) \
         # .withColumn("month_id", F.date_trunc("month", F.col("date")).cast("date"))
+
+    return normalize_columns(df)
+
+def normalize_columns(df:DataFrame) -> DataFrame:
+    for name in df.columns:
+        normalized_name = name.strip().replace(" ", "_").lower()
+        df = df.withColumnRenamed(name, normalized_name)
 
     return df

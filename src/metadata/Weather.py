@@ -3,6 +3,8 @@ from enum import Enum
 
 class Season(Enum):
     SPRING_MONTHS = [3, 4, 5]
+    HOT_SEASON = [6, 7, 8, 9]
+    COLD_SEASON = [1, 2, 3, 4]
 
 class WeatherDescription(Enum):
     #Clear sky

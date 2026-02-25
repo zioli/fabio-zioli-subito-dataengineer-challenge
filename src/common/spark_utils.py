@@ -2,9 +2,10 @@ from logging import Logger
 from pyspark.sql import SparkSession, DataFrame
 import os
 from src.common import utils
+from src.transformations import nomalizer
 
 def _build_stack_expression(cols):
-    aux = ", ".join([f"'{c.replace('_', ' ')}', {c}" for c in cols])
+    aux = ", ".join([f"'{c}', `{c}`" for c in cols])
     return f"stack({len(cols)}, {aux})"
 
 def melt(logger:Logger, df:DataFrame, columns_to_keep:list, dimension_column_name:str, value_column_name:str) -> DataFrame:
@@ -32,21 +33,14 @@ def get_dataframe(logger:Logger, spark:SparkSession, file_path:str) -> DataFrame
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found : {file_path}")
 
-    logger.info(f"load: Getting the normalized columns names ")
-    columns = utils.get_columns_names(file_path)
-
     df = spark.read \
         .option("header", "true") \
         .option("skipRows", 1) \
         .option("nullValue", "NULL") \
-        .option("nullValue", "null") \
         .option("inferSchema", "true") \
-        .csv(file_path) \
-        .toDF(*columns)
+        .csv(file_path)
 
     return df
-
-
 
 # def get_unpivot_dataframe(logger:Logger, spark:SparkSession, file_path, columns_to_keep, dimension_column_name, value_column_name) -> DataFrame:
 #     df_raw = get_dataframe(logger, spark, file_path)

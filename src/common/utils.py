@@ -1,15 +1,9 @@
-import csv
 import logging
 from logging import Logger
 import argparse
 import json
 
-def get_columns_names(file_path:str)->list:
-    with open(file_path, 'r') as f:
-        reader = csv.reader(f)
-        columns = next(reader)
 
-    return [c.strip().replace(" ", "_") for c in columns]
 
 def exclude_columns(columns:list, columns_to_remove:list) -> list:
     return [c for c in columns if c not in columns_to_remove]
